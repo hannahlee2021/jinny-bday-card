@@ -2,7 +2,7 @@
 let lastX = 0;
 let lastY = 0;
 let lastZ = 0;
-let motionThreshold = 10; // Lowered threshold for easier detection
+let motionThreshold = 5; // Lowered threshold for easier detection
 let isRedirecting = false;
 let motionCount = 0;
 let lastMotionTime = 0;
@@ -39,14 +39,17 @@ function handleMotion(event) {
 
     // Log motion data for debugging
     console.log(`Motion: X=${deltaX.toFixed(2)}, Y=${deltaY.toFixed(2)}, Z=${deltaZ.toFixed(2)}`);
+    
+    // Update status with current motion values
+    updateStatus('motion-status', `Motion: X=${deltaX.toFixed(1)}, Y=${deltaY.toFixed(1)}, Z=${deltaZ.toFixed(1)} (need >${motionThreshold})`, '#4ecdc4');
 
     // Check if motion exceeds threshold
     if (deltaX > motionThreshold || deltaY > motionThreshold || deltaZ > motionThreshold) {
         const now = Date.now();
-        if (now - lastMotionTime > 500) { // Prevent rapid triggers
+        if (now - lastMotionTime > 300) { // Reduced delay for faster response
             motionCount++;
             lastMotionTime = now;
-            updateStatus('motion-status', `Motion detected! Count: ${motionCount}`, '#4ecdc4');
+            updateStatus('motion-status', `Motion detected! Count: ${motionCount}/2`, '#f9ca24');
             
             // Require 2 motion events to trigger redirect
             if (motionCount >= 2) {
@@ -112,6 +115,17 @@ function requestMotionPermission() {
 // Start motion detection when page loads
 function startMotionDetection() {
     updateStatus('motion-status', 'Starting motion detection...', '#f9ca24');
+    
+    // Add test button functionality
+    const testButton = document.getElementById('test-button');
+    if (testButton) {
+        testButton.addEventListener('click', () => {
+            updateStatus('motion-status', 'Test button clicked! Redirecting...', '#45b7d1');
+            setTimeout(() => {
+                window.location.href = 'letter.html';
+            }, 300);
+        });
+    }
     
     // Check if DeviceMotion is supported
     if (typeof DeviceMotionEvent !== 'undefined') {
