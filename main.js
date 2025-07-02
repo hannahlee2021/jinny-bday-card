@@ -4,7 +4,7 @@ console.log('main.js loaded successfully!');
 let lastX = 0;
 let lastY = 0;
 let lastZ = 0;
-let motionThreshold = 50; // Lowered threshold for easier detection
+let motionThreshold = 15; // Increased threshold for more vigorous shaking required
 let isRedirecting = false;
 let motionCount = 0;
 let lastMotionTime = 0;
@@ -48,13 +48,13 @@ function handleMotion(event) {
     // Check if motion exceeds threshold
     if (deltaX > motionThreshold || deltaY > motionThreshold || deltaZ > motionThreshold) {
         const now = Date.now();
-        if (now - lastMotionTime > 300) { // Reduced delay for faster response
+        if (now - lastMotionTime > 200) { // Shorter delay to capture vigorous shaking
             motionCount++;
             lastMotionTime = now;
-            updateStatus('motion-status', `Motion detected! Count: ${motionCount}/2`, '#f9ca24');
+            updateStatus('motion-status', `Motion detected! Count: ${motionCount}/4`, '#f9ca24');
             
-            // Require 2 motion events to trigger redirect
-            if (motionCount >= 2) {
+            // Require 4 motion events to trigger redirect (more vigorous shaking)
+            if (motionCount >= 4) {
                 updateStatus('motion-status', 'Motion threshold reached! Redirecting...', '#45b7d1');
                 isRedirecting = true;
                 
