@@ -1,0 +1,118 @@
+body {
+    background-color: white;
+}
+
+h1 {
+    font-family: 'Ballet', cursive;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 90px;
+    text-align: center;
+}
+
+h2 {
+    font-family: 'Helvetica Neue', sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 20px;
+    text-align: center;
+    
+}
+
+h3 {
+    font-family: 'Helvetica Neue', sans-serif;
+    color: #84FC14;
+    text-align: center;
+-webkit-text-stroke-width: 1px;
+-webkit-text-stroke-color: #000;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;    
+}
+
+.pg-1-cont h2 {
+    margin-top: -10%;
+}
+
+
+.pg-1-cont {
+  
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 50%;
+}
+
+#text-cont {
+    /* border: 1px solid blue; */
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 20px;
+    margin: 10px 0;
+
+}
+
+.entry-right {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+#text-1 {
+    /* border: 1px solid black; */
+}
+
+.circle-cont {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px solid red; */
+}
+#circle-1 {
+    width: 275px;
+    height: 275px;
+    border-radius: 50%;
+    border: 1px solid #84FC14;
+    background-image: url("assets/black-polka.png");
+    background-size: cover;
+}
+
+#circle-1 h3 {
+    position: absolute; 
+    width: 50%;
+    text-align: center;
+    padding-top: 5%;
+}
+
+
+
+@media screen and (max-width: 425px) {
+    #circle-1 h3 {
+        left: 105px;
+    }
+}
+
+
+@media screen and (max-width: 375px) {
+    #circle-1 h3 {
+        left: 98px;
+    }
+}
+
+@media screen and (max-width: 320px) {
+    #circle-1 h3 {
+        left: 85px;
+    }
+}
+
+
+@media screen and (min-width: 426px) {
+    .pg-1-cont {
+        display: none;
+    }
+}
+
