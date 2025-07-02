@@ -4,7 +4,7 @@ console.log('main.js loaded successfully!');
 let lastX = 0;
 let lastY = 0;
 let lastZ = 0;
-let motionThreshold = 5; // Lowered threshold for easier detection
+let motionThreshold = 10; // Lowered threshold for easier detection
 let isRedirecting = false;
 let motionCount = 0;
 let lastMotionTime = 0;
