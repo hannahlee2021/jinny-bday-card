@@ -6,6 +6,7 @@ let motionThreshold = 10; // Lowered threshold for easier detection
 let isRedirecting = false;
 let motionCount = 0;
 let lastMotionTime = 0;
+let permissionRequested = false;
 
 // Function to update status display
 function updateStatus(elementId, message, color = '#666') {
@@ -83,6 +84,32 @@ function handleOrientation(event) {
 }
 
 // Request permission and start listening for motion
+function requestMotionPermission() {
+    if (permissionRequested) return;
+    permissionRequested = true;
+    
+    updateStatus('permission-status', 'Requesting motion permission...', '#f9ca24');
+    
+    DeviceMotionEvent.requestPermission()
+        .then(permissionState => {
+            updateStatus('permission-status', `Permission state: ${permissionState}`, 
+                       permissionState === 'granted' ? '#00b894' : '#ff6b6b');
+            if (permissionState === 'granted') {
+                window.addEventListener('devicemotion', handleMotion);
+                updateStatus('motion-status', 'Motion detection started! Shake your phone!', '#00b894');
+            } else {
+                updateStatus('motion-status', 'Motion permission denied, using fallback', '#ff6b6b');
+                setupFallback();
+            }
+        })
+        .catch(error => {
+            updateStatus('permission-status', `Error: ${error.message}`, '#ff6b6b');
+            console.error('Error requesting motion permission:', error);
+            setupFallback();
+        });
+}
+
+// Start motion detection when page loads
 function startMotionDetection() {
     updateStatus('motion-status', 'Starting motion detection...', '#f9ca24');
     
@@ -92,37 +119,23 @@ function startMotionDetection() {
         
         // Request permission (iOS 13+)
         if (typeof DeviceMotionEvent.requestPermission === 'function') {
-            updateStatus('permission-status', 'Requesting motion permission...', '#f9ca24');
+            updateStatus('permission-status', 'Tap anywhere to enable motion detection', '#f9ca24');
             
-            // For iOS, we need to trigger this from a user interaction
-            const requestPermission = () => {
-                DeviceMotionEvent.requestPermission()
-                    .then(permissionState => {
-                        updateStatus('permission-status', `Permission state: ${permissionState}`, 
-                                   permissionState === 'granted' ? '#00b894' : '#ff6b6b');
-                        if (permissionState === 'granted') {
-                            window.addEventListener('devicemotion', handleMotion);
-                            updateStatus('motion-status', 'Motion detection started!', '#00b894');
-                        } else {
-                            updateStatus('motion-status', 'Motion permission denied, using fallback', '#ff6b6b');
-                            setupFallback();
-                        }
-                    })
-                    .catch(error => {
-                        updateStatus('permission-status', `Error: ${error.message}`, '#ff6b6b');
-                        console.error('Error requesting motion permission:', error);
-                        setupFallback();
-                    });
-            };
-            
-            // Try to request permission immediately
-            requestPermission();
-            
-            // Also set up a click handler to request permission
+            // Set up click handler to request permission
             document.addEventListener('click', () => {
-                updateStatus('permission-status', 'Click detected, requesting permission...', '#f9ca24');
-                requestPermission();
-            }, { once: true });
+                if (!permissionRequested) {
+                    updateStatus('permission-status', 'Click detected, requesting permission...', '#f9ca24');
+                    requestMotionPermission();
+                }
+            });
+            
+            // Also set up touch handler
+            document.addEventListener('touchstart', () => {
+                if (!permissionRequested) {
+                    updateStatus('permission-status', 'Touch detected, requesting permission...', '#f9ca24');
+                    requestMotionPermission();
+                }
+            });
             
         } else {
             // For devices that don't require permission
