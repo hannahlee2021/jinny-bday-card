@@ -41,10 +41,7 @@
                         <div id="motion-status">Checking motion support...</div>
                         <div id="permission-status">Waiting for permission...</div>
                     </div>
-                    <button id="test-button" style="margin-top: 20px; padding: 10px 20px; background: #4ecdc4; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        Test Redirect
-                    </button>
-                    <button id="test-motion-button" style="margin-top: 10px; padding: 10px 20px; background: #f9ca24; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    <button id="test-motion-button" style="margin-top: 20px; padding: 10px 20px; background: #4ecdc4; color: white; border: none; border-radius: 5px; cursor: pointer;">
                         Test Motion
                     </button>
                 </div>
@@ -55,6 +52,23 @@
 
 
        <script src = "main.js"></script>
+       <script>
+           console.log('Inline script working!');
+           document.addEventListener('DOMContentLoaded', function() {
+               console.log('DOM loaded!');
+               // Test if we can find the button
+               const testMotionButton = document.getElementById('test-motion-button');
+               console.log('Test motion button found:', !!testMotionButton);
+               
+               // Add simple click handler
+               if (testMotionButton) {
+                   testMotionButton.onclick = function() {
+                       console.log('Test motion button clicked!');
+                       alert('Test motion button works!');
+                   };
+               }
+           });
+       </script>
 
 </body>
 </html>

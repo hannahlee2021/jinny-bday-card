@@ -1,3 +1,5 @@
+console.log('main.js loaded successfully!');
+
 // Variables to track motion
 let lastX = 0;
 let lastY = 0;
