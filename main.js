@@ -167,50 +167,37 @@ function startMotionDetection() {
             updateStatus('permission-status', 'Starting motion detection...', '#f9ca24');
             console.log('Starting motion detection after user interaction...');
             
-            // Try to add the event listener directly first
-            try {
-                window.addEventListener('devicemotion', handleMotion);
-                updateStatus('motion-status', 'Motion detection started! Shake your phone!', '#00b894');
-                updateStatus('permission-status', 'Motion detection active', '#00b894');
-                console.log('Motion detection started directly');
-                
-                // Also try to request permission in the background
-                if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                    DeviceMotionEvent.requestPermission()
-                        .then(permissionState => {
-                            console.log('Background permission result:', permissionState);
-                        })
-                        .catch(error => {
-                            console.log('Background permission failed:', error.message);
-                        });
-                }
-                
-            } catch (error) {
-                console.error('Direct motion detection failed:', error);
-                
-                // Fallback to permission request
-                if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                    updateStatus('permission-status', 'Requesting motion permission...', '#f9ca24');
-                    console.log('Requesting motion permission after direct attempt failed...');
-                    
-                    DeviceMotionEvent.requestPermission()
-                        .then(permissionState => {
-                            console.log('Permission result:', permissionState);
-                            if (permissionState === 'granted') {
-                                updateStatus('motion-status', 'Motion detection started! Shake your phone!', '#00b894');
-                                updateStatus('permission-status', 'Motion detection active', '#00b894');
-                                console.log('Motion detection started with permission');
-                            } else {
-                                updateStatus('motion-status', 'Permission denied, using fallback', '#ff6b6b');
-                                setupFallback();
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Permission request failed:', error);
-                            updateStatus('motion-status', 'Permission failed, using fallback', '#ff6b6b');
+            // For iOS Safari, we need to request permission in a very specific way
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                // Request permission immediately after user interaction
+                DeviceMotionEvent.requestPermission()
+                    .then(permissionState => {
+                        console.log('Permission result:', permissionState);
+                        if (permissionState === 'granted') {
+                            // Now add the motion listener
+                            window.addEventListener('devicemotion', handleMotion);
+                            updateStatus('motion-status', 'Motion detection started! Shake your phone!', '#00b894');
+                            updateStatus('permission-status', 'Motion detection active', '#00b894');
+                            console.log('Motion detection started with permission');
+                        } else {
+                            updateStatus('motion-status', 'Permission denied, using fallback', '#ff6b6b');
                             setupFallback();
-                        });
-                } else {
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Permission request failed:', error);
+                        updateStatus('motion-status', 'Permission failed, using fallback', '#ff6b6b');
+                        setupFallback();
+                    });
+            } else {
+                // For devices that don't require permission
+                try {
+                    window.addEventListener('devicemotion', handleMotion);
+                    updateStatus('motion-status', 'Motion detection started! Shake your phone!', '#00b894');
+                    updateStatus('permission-status', 'Motion detection active', '#00b894');
+                    console.log('Motion detection started directly');
+                } catch (error) {
+                    console.error('Direct motion detection failed:', error);
                     updateStatus('motion-status', 'Motion detection failed, using fallback', '#ff6b6b');
                     setupFallback();
                 }
@@ -307,15 +294,40 @@ function testMotion() {
     console.log('Testing motion detection...');
     updateStatus('motion-status', 'Testing motion detection...', '#f9ca24');
     
-    // Try to add a simple motion listener
-    try {
-        window.addEventListener('devicemotion', (event) => {
-            console.log('Motion event received!', event);
-            updateStatus('motion-status', 'Motion events are working!', '#00b894');
-        });
-        console.log('Motion listener added successfully');
-    } catch (error) {
-        console.error('Failed to add motion listener:', error);
-        updateStatus('motion-status', 'Motion listener failed', '#ff6b6b');
+    // Try to request permission first
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        DeviceMotionEvent.requestPermission()
+            .then(permissionState => {
+                console.log('Test permission result:', permissionState);
+                if (permissionState === 'granted') {
+                    // Add a simple motion listener
+                    window.addEventListener('devicemotion', (event) => {
+                        console.log('Motion event received!', event);
+                        updateStatus('motion-status', 'Motion events are working!', '#00b894');
+                    });
+                    console.log('Motion listener added successfully with permission');
+                    updateStatus('motion-status', 'Motion detection working!', '#00b894');
+                } else {
+                    console.log('Test permission denied');
+                    updateStatus('motion-status', 'Motion permission denied', '#ff6b6b');
+                }
+            })
+            .catch(error => {
+                console.error('Test permission failed:', error);
+                updateStatus('motion-status', 'Motion permission failed', '#ff6b6b');
+            });
+    } else {
+        // For devices that don't require permission
+        try {
+            window.addEventListener('devicemotion', (event) => {
+                console.log('Motion event received!', event);
+                updateStatus('motion-status', 'Motion events are working!', '#00b894');
+            });
+            console.log('Motion listener added successfully');
+            updateStatus('motion-status', 'Motion detection working!', '#00b894');
+        } catch (error) {
+            console.error('Failed to add motion listener:', error);
+            updateStatus('motion-status', 'Motion listener failed', '#ff6b6b');
+        }
     }
 }
