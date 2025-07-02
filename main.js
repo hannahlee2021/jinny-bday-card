@@ -146,19 +146,41 @@ function startMotionDetection() {
     if (typeof DeviceMotionEvent !== 'undefined') {
         updateStatus('motion-status', 'DeviceMotion is supported', '#6c5ce7');
         
+        // Try direct motion detection first (works on some devices)
+        let motionStarted = false;
+        
+        function tryStartMotion() {
+            if (motionStarted) return;
+            motionStarted = true;
+            
+            try {
+                window.addEventListener('devicemotion', handleMotion);
+                updateStatus('motion-status', 'Motion detection started! Shake your phone!', '#00b894');
+                updateStatus('permission-status', 'Motion detection active', '#00b894');
+                console.log('Motion detection started directly');
+            } catch (error) {
+                console.error('Direct motion detection failed:', error);
+                updateStatus('motion-status', 'Direct motion failed, trying permission...', '#f9ca24');
+                // Fall back to permission request
+                setTimeout(() => {
+                    requestMotionPermission();
+                }, 100);
+            }
+        }
+        
         // Request permission (iOS 13+)
         if (typeof DeviceMotionEvent.requestPermission === 'function') {
             updateStatus('permission-status', 'Tap anywhere to enable motion detection', '#f9ca24');
             
-            // Set up click handler to request permission
+            // Set up click handler to start motion detection
             document.addEventListener('click', (event) => {
                 // Don't trigger on test button click
                 if (event.target.id === 'test-button') return;
                 
                 if (!permissionRequested) {
-                    updateStatus('permission-status', 'Click detected, requesting permission...', '#f9ca24');
-                    console.log('Attempting to request motion permission...');
-                    requestMotionPermission();
+                    updateStatus('permission-status', 'Click detected, starting motion detection...', '#f9ca24');
+                    console.log('Attempting to start motion detection...');
+                    tryStartMotion();
                 }
             });
             
@@ -168,9 +190,9 @@ function startMotionDetection() {
                 if (event.target.id === 'test-button') return;
                 
                 if (!permissionRequested) {
-                    updateStatus('permission-status', 'Touch detected, requesting permission...', '#f9ca24');
-                    console.log('Attempting to request motion permission via touch...');
-                    requestMotionPermission();
+                    updateStatus('permission-status', 'Touch detected, starting motion detection...', '#f9ca24');
+                    console.log('Attempting to start motion detection via touch...');
+                    tryStartMotion();
                 }
             });
             
