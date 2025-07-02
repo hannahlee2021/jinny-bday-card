@@ -152,20 +152,29 @@ function startMotionDetection() {
         function tryStartMotion() {
             if (motionStarted) return;
             motionStarted = true;
+            permissionRequested = true;
             
-            try {
-                window.addEventListener('devicemotion', handleMotion);
-                updateStatus('motion-status', 'Motion detection started! Shake your phone!', '#00b894');
-                updateStatus('permission-status', 'Motion detection active', '#00b894');
-                console.log('Motion detection started directly');
-            } catch (error) {
-                console.error('Direct motion detection failed:', error);
-                updateStatus('motion-status', 'Direct motion failed, trying permission...', '#f9ca24');
-                // Fall back to permission request
-                setTimeout(() => {
-                    requestMotionPermission();
-                }, 100);
-            }
+            updateStatus('permission-status', 'Requesting motion permission...', '#f9ca24');
+            console.log('Requesting motion permission after user interaction...');
+            
+            DeviceMotionEvent.requestPermission()
+                .then(permissionState => {
+                    console.log('Permission result:', permissionState);
+                    if (permissionState === 'granted') {
+                        window.addEventListener('devicemotion', handleMotion);
+                        updateStatus('motion-status', 'Motion detection started! Shake your phone!', '#00b894');
+                        updateStatus('permission-status', 'Motion detection active', '#00b894');
+                        console.log('Motion detection started with permission');
+                    } else {
+                        updateStatus('motion-status', 'Permission denied, using fallback', '#ff6b6b');
+                        setupFallback();
+                    }
+                })
+                .catch(error => {
+                    console.error('Permission request failed:', error);
+                    updateStatus('motion-status', 'Permission failed, using fallback', '#ff6b6b');
+                    setupFallback();
+                });
         }
         
         // Request permission (iOS 13+)
