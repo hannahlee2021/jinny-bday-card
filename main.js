@@ -92,24 +92,34 @@ function requestMotionPermission() {
     permissionRequested = true;
     
     updateStatus('permission-status', 'Requesting motion permission...', '#f9ca24');
+    console.log('Starting permission request...');
     
-    DeviceMotionEvent.requestPermission()
-        .then(permissionState => {
-            updateStatus('permission-status', `Permission state: ${permissionState}`, 
-                       permissionState === 'granted' ? '#00b894' : '#ff6b6b');
-            if (permissionState === 'granted') {
-                window.addEventListener('devicemotion', handleMotion);
-                updateStatus('motion-status', 'Motion detection started! Shake your phone!', '#00b894');
-            } else {
-                updateStatus('motion-status', 'Motion permission denied, using fallback', '#ff6b6b');
+    try {
+        DeviceMotionEvent.requestPermission()
+            .then(permissionState => {
+                console.log('Permission result:', permissionState);
+                updateStatus('permission-status', `Permission state: ${permissionState}`, 
+                           permissionState === 'granted' ? '#00b894' : '#ff6b6b');
+                if (permissionState === 'granted') {
+                    window.addEventListener('devicemotion', handleMotion);
+                    updateStatus('motion-status', 'Motion detection started! Shake your phone!', '#00b894');
+                    console.log('Motion detection successfully started');
+                } else {
+                    updateStatus('motion-status', 'Motion permission denied, using fallback', '#ff6b6b');
+                    console.log('Permission denied, setting up fallback');
+                    setupFallback();
+                }
+            })
+            .catch(error => {
+                console.error('Permission request failed:', error);
+                updateStatus('permission-status', `Error: ${error.message}`, '#ff6b6b');
                 setupFallback();
-            }
-        })
-        .catch(error => {
-            updateStatus('permission-status', `Error: ${error.message}`, '#ff6b6b');
-            console.error('Error requesting motion permission:', error);
-            setupFallback();
-        });
+            });
+    } catch (error) {
+        console.error('Error in permission request:', error);
+        updateStatus('permission-status', `Error: ${error.message}`, '#ff6b6b');
+        setupFallback();
+    }
 }
 
 // Start motion detection when page loads
@@ -127,6 +137,11 @@ function startMotionDetection() {
         });
     }
     
+    // Debug: Check what APIs are available
+    console.log('DeviceMotionEvent available:', typeof DeviceMotionEvent !== 'undefined');
+    console.log('DeviceOrientationEvent available:', typeof DeviceOrientationEvent !== 'undefined');
+    console.log('DeviceMotionEvent.requestPermission available:', typeof DeviceMotionEvent?.requestPermission === 'function');
+    
     // Check if DeviceMotion is supported
     if (typeof DeviceMotionEvent !== 'undefined') {
         updateStatus('motion-status', 'DeviceMotion is supported', '#6c5ce7');
@@ -136,17 +151,25 @@ function startMotionDetection() {
             updateStatus('permission-status', 'Tap anywhere to enable motion detection', '#f9ca24');
             
             // Set up click handler to request permission
-            document.addEventListener('click', () => {
+            document.addEventListener('click', (event) => {
+                // Don't trigger on test button click
+                if (event.target.id === 'test-button') return;
+                
                 if (!permissionRequested) {
                     updateStatus('permission-status', 'Click detected, requesting permission...', '#f9ca24');
+                    console.log('Attempting to request motion permission...');
                     requestMotionPermission();
                 }
             });
             
             // Also set up touch handler
-            document.addEventListener('touchstart', () => {
+            document.addEventListener('touchstart', (event) => {
+                // Don't trigger on test button touch
+                if (event.target.id === 'test-button') return;
+                
                 if (!permissionRequested) {
                     updateStatus('permission-status', 'Touch detected, requesting permission...', '#f9ca24');
+                    console.log('Attempting to request motion permission via touch...');
                     requestMotionPermission();
                 }
             });
@@ -167,6 +190,7 @@ function startMotionDetection() {
         
     } else {
         updateStatus('motion-status', 'DeviceMotion not supported, using fallback', '#ff6b6b');
+        console.log('DeviceMotionEvent is undefined - falling back to click/touch');
         setupFallback();
     }
 }
