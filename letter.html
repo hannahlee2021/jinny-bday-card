@@ -14,19 +14,50 @@
 
 
    <div class = "pg-3-cont">
-     <div class = "letter-cont">
+     <div id = "letter-cont" class = "hidden">
         <div id = "letter-text">
+
+            <h1>Happy 22nd Jinny!!!!!</h1>
             <p>
-                
+                what a wonderful day to celebrate the beauty of YOU! my gorgeous, oh so talented, kind, thoughtful jinjin.... becoming friends with you has been written in the stars (s/o jennscale LMAO), and i am so glad fate has decided this way. while both you and i have changed drastically over the course of our friendship, it warms my heart to know our bond remains the same~ whether we are in the same area or not, i cannot wait to see your successes (and i know you will THRIVE!) as we enter this new chapter of our lives! continue being you, and only good things shall come your way. 
+
+진진이 진짜로 잘 될거고 사랑한다잉 ^^
+
             </p>
+
+       <p>
+        ᥫ᭡.  hannah
+       </p>
+           
         </div>
+     </div>
+
+     <div class = "button-cont">
+        <button id = "close-button">close</button>
      </div>
 
 
 
    </div>
 
-   
+   <script>
+    const button = document.getElementById("close-button");
+    const letterCont = document.getElementById("letter-cont");
+
+    button.addEventListener("click", function() {
+        console.log("clicked");
+
+        if(letterCont.classList.contains("hidden")) {
+            letterCont.style.opacity = "1";
+            letterCont.classList.remove("hidden");
+            button.innerHTML = "close";
+        } else {
+            letterCont.style.opacity = "0";
+            letterCont.classList.add("hidden");
+            button.innerHTML = "open";
+        }
+    })
+   </script>
 
 </body>
 </html>

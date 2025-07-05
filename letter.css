@@ -3,3 +3,60 @@ body {
     background-size: cover;
     
 }
+
+h1 {
+    font-family: "Ballet", cursive;
+    font-size: 25px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+p {
+    font-family: "Helvetica Neue", sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 200;
+    line-height: normal;
+}
+
+.pg-3-cont {
+    /* display: flex;
+    justify-content: center;
+    padding-left: 10%;
+    padding-top: 30%; */
+}
+
+#letter-cont {
+    
+    /* width: 80%;*/
+    padding-left: 10%;
+    padding-right: 10%;
+    height: auto; 
+    position: relative;
+    top: 100px;
+    background-color: white;
+    border: 1px solid black;
+}
+
+.button-cont {
+    position: relative;
+    padding-left: 38%;
+    top: 130px;
+    
+   
+    
+
+}
+
+#close-button {
+    width: 100px;
+    height: 30px;
+    background-color: #84FC14;
+}
+
+@media screen and (max-width: 320px) {
+    .button-cont {
+        padding-left: 35%;
+    }
+}
